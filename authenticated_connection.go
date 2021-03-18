@@ -8,6 +8,8 @@ import (
 	"net/http"
 )
 
+var RefreshTimeMargin = time.Duration(30) * time.Second
+
 type AuthenticatedConnection struct {
 	Connection *Connection
 	AuthToken string
@@ -50,8 +52,8 @@ func (conn *AuthenticatedConnection) PerformTokenRefresh() error {
 		return err
 	}
 
-	// Expiration time, but give 10 seconds for potential errors
-	exp := time.Now().Add(time.Duration(resultData["expires_in"].(float64)) * time.Second - time.Duration(10) * time.Second)
+	// Expiration time, but give 30 seconds for potential errors
+	exp := time.Now().Add(time.Duration(resultData["expires_in"].(float64)) * time.Second - RefreshTimeMargin)
 	tok := resultData["access_token"].(string)
 
 	conn.Expiration = &exp
